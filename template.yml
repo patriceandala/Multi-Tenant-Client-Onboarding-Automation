@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Multi-Tenant Client Onboarding
+Description: Multi-Tenant Client Onboarding Automation
 
 Resources:
-  # DynamoDB Table (Multi-Tenant)
+  # DynamoDB Table for Multi-Tenancy
   MultiTenantTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -20,7 +20,7 @@ Resources:
         - AttributeName: resourceType#resourceId
           KeyType: RANGE
 
-  # Lambda Function for Onboarding
+  # Lambda Function for Client Onboarding
   OnboardingLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -28,6 +28,7 @@ Resources:
       Runtime: nodejs18.x
       Handler: index.handler
       CodeUri: src/
+      BuildMethod: nodejs18.x  # ✅ Ensures dependencies are installed during deployment
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref MultiTenantTable

@@ -3,88 +3,139 @@
 By Patrice Andala Opiyo
 
 ## 📌 Overview
-This project is a **multi-tenant client onboarding system** built using **AWS Lambda, API Gateway, and DynamoDB**, deployed via **AWS SAM** and automated using **GitHub Actions CI/CD**.
-
-## 🎯 How This Meets the Assignment Requirements
-
-| Requirement | Implementation |
-|------------|---------------|
-| **1. Infrastructure Provisioning** | Uses AWS SAM (`template.yml`) to provision **DynamoDB, Lambda, API Gateway** |
-| **2. Onboarding Process Implementation** | Lambda (`index.js`) receives client details, assigns a `tenantId`, and stores it in **DynamoDB** |
-| **3. Error Handling & Logging** | Uses **try-catch** blocks for **400 (Bad Request) and 500 (Internal Server Error)**, with **CloudWatch logs** |
-| **4. CI/CD Simulation** | **GitHub Actions (`deploy.yml`) automatically builds & deploys** on `git push` |
-| **5. Documentation** | This README provides **setup & deployment instructions** |
-| **6. Testing** | Jest unit tests (`test_onboarding.js`) mock AWS SDK, covering **success, missing fields, and DB failures** |
+This project automates the onboarding process for new clients in a multi-tenant SaaS platform. It provisions and configures essential AWS resources in an automated and scalable manner using AWS SAM and GitHub Actions.
 
 ---
 
-## 🚀 How to Set Up the Project
-This guide helps you **set up the project from scratch**, deploy it to AWS, and test the API.
+## ✅ How This Project Meets the Assignment Requirements
 
-### **1️⃣ Prerequisites**
-Before proceeding, make sure you have:
-- **Node.js** (`v18.x` or later)
-- **AWS CLI** (`aws configure` must be set up)
-- **AWS SAM CLI** (`sam --version` should work)
-- **GitHub Actions** (for CI/CD automation)
+### **1. Infrastructure Provisioning**
+- ✅ **DynamoDB Table**: A table (`MultiTenantClients`) with a partition key (`tenantId`) and sort key (`resourceType#resourceId`) to segregate tenant data.
+- ✅ **AWS Lambda Function**: `OnboardingLambda` processes incoming client data and stores it in DynamoDB.
+- ✅ **API Gateway**: Exposes an endpoint (`POST /onboard`) to trigger the Lambda function.
+- ✅ **AWS SAM Template**: The `template.yml` file provisions all resources via AWS CloudFormation.
+
+### **2. Onboarding Process Implementation**
+- ✅ **Accepts Client Details** (`clientName`, `clientPhone`, etc.)
+- ✅ **Generates a Unique Tenant ID** using `uuidv4()`
+- ✅ **Stores Client Data in DynamoDB** via AWS SDK v3 (`@aws-sdk/client-dynamodb`)
+
+### **3. Error Handling & Logging**
+- ✅ **Handles missing fields** (`400 Bad Request` response)
+- ✅ **Catches unexpected errors** (`500 Internal Server Error` response)
+- ✅ **Logs all steps** (Lambda execution, DynamoDB transactions)
+
+### **4. CI/CD Pipeline with GitHub Actions**
+- ✅ **Automates Deployment** when pushing to `main`
+- ✅ **Runs Tests with Jest** before deployment
+- ✅ **Uses GitHub Secrets** for AWS credentials
+
+### **5. Unit Testing**
+- ✅ **Mocks AWS SDK calls** (prevents real API calls during testing)
+- ✅ **Tests successful onboarding (`200 OK`)**
+- ✅ **Tests missing field errors (`400 Bad Request`)**
+- ✅ **Tests DynamoDB failures (`500 Internal Server Error`)**
 
 ---
 
-### **2️⃣ Clone the Repository**
+# 🚀 **Setup Guide**
+
+## **1️⃣ Prerequisites**
+- ✅ **AWS CLI installed** ([Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html))
+- ✅ **AWS SAM CLI installed** ([Install Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
+- ✅ **Node.js 18+ installed** ([Download Node.js](https://nodejs.org/))
+- ✅ **GitHub Actions set up** (for CI/CD deployment)
+
+---
+
+## **2️⃣ Clone the Repository**
 ```sh
-git clone https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation.git
-cd Multi-Tenant-Client-Onboarding-Automation
+ git clone https://github.com/your-username/Multi-Tenant-Client-Onboarding-Automation.git
+ cd Multi-Tenant-Client-Onboarding-Automation
 ```
 
 ---
 
-### **3️⃣ Create an S3 Bucket for AWS SAM Deployments**
+## **3️⃣ AWS Setup**
+
+### **1. Create an S3 Bucket** (For SAM Deployment Artifacts)
 ```sh
-aws s3 mb s3://multi-tenant-sam-deployments --region us-east-1
+aws s3 mb s3://multi-tenant-sam-deployments
 ```
-- Ensure **Object Ownership** is set to `ACLs Disabled`
-- Ensure **Block Public Access** is **enabled**
+
+### **2. Create IAM Role for Lambda Execution**
+#### **(Option 1: AWS Console)**
+1. Go to **AWS IAM** → **Roles** → **Create Role**
+2. Select **AWS Service** → **Lambda**
+3. Attach policies:
+   - `AmazonDynamoDBFullAccess`
+   - `AWSLambdaBasicExecutionRole`
+4. Name the role: `LambdaExecutionRole`
+5. Copy the **Role ARN** for later use
+
+#### **(Option 2: AWS CLI)**
+```sh
+aws iam create-role --role-name LambdaExecutionRole \
+--assume-role-policy-document file://trust-policy.json
+```
+_(Define `trust-policy.json` as a file allowing Lambda to assume this role)_
 
 ---
 
-### **4️⃣ Create IAM User & Set Permissions**
-1. Go to **AWS Console → IAM → Users → Create User**
-2. Name it **`github-actions-deploy`**
-3. Attach Policies:
-   - ✅ `AdministratorAccess` *(Full access)* **OR**
-   - ✅ `AWSLambdaFullAccess`, `AmazonDynamoDBFullAccess`, `AmazonAPIGatewayAdministrator`, `AWSCloudFormationFullAccess`
-4. Copy the **Access Key ID** and **Secret Access Key**
+### **3. Create IAM User for GitHub Actions**
+```sh
+aws iam create-user --user-name github-actions-deploy
+```
+Attach these policies:
+- `AdministratorAccess` (or least privilege policies like `AWSLambdaFullAccess`, `AmazonS3FullAccess`, `AWSCloudFormationFullAccess`, `AmazonDynamoDBFullAccess`)
+
+Generate access keys for the user:
+```sh
+aws iam create-access-key --user-name github-actions-deploy
+```
+Copy the **Access Key ID** and **Secret Access Key** for later.
 
 ---
 
-### **5️⃣ Configure GitHub Secrets**
-1. Go to **GitHub Repository → Settings → Secrets → Actions**
-2. Click **"New Repository Secret"**, then add:
-   - **Name:** `AWS_ACCESS_KEY_ID` **→ Value:** *(Paste Access Key ID)*
-   - **Name:** `AWS_SECRET_ACCESS_KEY` **→ Value:** *(Paste Secret Access Key)*
+## **4️⃣ Add AWS Credentials to GitHub Actions**
+Go to **GitHub Repo** → **Settings** → **Secrets and Variables** → **Actions**.
+
+Add the following secrets:
+- `AWS_ACCESS_KEY_ID` → *(Paste Access Key ID)*
+- `AWS_SECRET_ACCESS_KEY` → *(Paste Secret Access Key)*
 
 ---
 
-### **6️⃣ Deploy the Project**
-Run the following:
+## **5️⃣ Deploy the Project to AWS**
+
+### **1. Install Dependencies**
+```sh
+npm install
+```
+
+### **2. Build and Deploy with AWS SAM**
 ```sh
 sam build
 sam deploy --stack-name multi-tenant-onboarding \
-           --s3-bucket multi-tenant-sam-deployments \
-           --capabilities CAPABILITY_IAM \
-           --no-confirm-changeset
+  --s3-bucket multi-tenant-sam-deployments \
+  --capabilities CAPABILITY_IAM
 ```
-After deployment, **copy the API Gateway URL** from the output.
+
+✅ **After deployment, AWS will print an API Gateway URL** like:
+```
+https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboard/
+```
 
 ---
 
-### **7️⃣ Test the API**
-Use **Postman** or `curl` to make a **POST request**:
+## **6️⃣ Test the API**
+### **Make a POST request to onboard a new client**
 ```sh
 curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboard/ \
   -H "Content-Type: application/json" \
   -d '{"clientName": "Acme Corp", "clientPhone": "+1234567890"}'
 ```
+
 ✅ **Expected Response:**
 ```json
 {
@@ -95,42 +146,14 @@ curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboar
 
 ---
 
-### **8️⃣ Run Unit Tests Locally**
+## **7️⃣ Run Local Tests**
 ```sh
-npm install  # Install dependencies
-npm test     # Run Jest tests
+  npm test
 ```
-✅ **Expected Output:**
-```
-PASS  tests/test_onboarding.js
-  ✓ should successfully onboard a new client
-  ✓ should return a 400 error if clientName is missing
-  ✓ should return a 500 error on database failure
-```
+✅ Ensures the Lambda function is working correctly!
 
 ---
 
-### **9️⃣ Automate Deployment Using GitHub Actions**
-Every push to `main` **triggers a GitHub Actions workflow** (`.github/workflows/deploy.yml`).
-
-```sh
-git add .
-git commit -m "Updated onboarding logic"
-git push origin main
-```
-✅ **This automatically builds and deploys your Lambda function.**
-
----
-
-## **🎯 Next Steps & Enhancements**
-🔹 **Extend Multi-Tenancy:** Add `tenantId` authentication with **AWS Cognito**.
-🔹 **Admin Dashboard:** Integrate a frontend for managing tenants.
-🔹 **Multi-Region Deployment:** Extend to multiple AWS regions.
-
----
-
-## **📞 Need Help?**
-If you face any issues, open an issue in the [GitHub repository](https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation/issues).
-
-🚀 **Enjoy automated multi-tenant onboarding with AWS!** 🎉
+# 🎉 **Congratulations! You’ve Successfully Set Up the Multi-Tenant Client Onboarding System!**
+🚀 Let me know if you need any further improvements or additional features!
 
