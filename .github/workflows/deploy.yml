@@ -18,7 +18,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: us-east-1  # Change this if using a different AWS region
 
       - name: Install AWS SAM CLI via Pip
         run: |
@@ -29,13 +29,16 @@ jobs:
       - name: Verify AWS SAM Installation
         run: sam --version || echo "SAM CLI installation failed"
 
+      - name: Remove Previous Build Cache
+        run: rm -rf .aws-sam/  # ✅ Ensures a fresh build
+
       - name: Install Node.js Dependencies
         run: |
           cd src
-          npm install  # ✅ Ensures node_modules is included in the deployment package
+          npm install  # ✅ Ensures dependencies like uuid are installed
 
       - name: Build with AWS SAM
-        run: sam build --use-container  # ✅ Ensures dependencies are installed correctly
+        run: sam build
 
       - name: Deploy with AWS SAM
         run: |
