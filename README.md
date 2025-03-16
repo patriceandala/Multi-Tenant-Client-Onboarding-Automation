@@ -1,76 +1,91 @@
-#  Multi-Tenant Client Onboarding Automation
+# Multi-Tenant Client Onboarding Automation
 
-## **Overview**
-This project is a proof-of-concept solution for automating the **onboarding process** of new clients in a **multi-tenant SaaS platform** using AWS **serverless services**. 
+By Patrice Andala Opiyo
 
-It provisions and configures essential AWS resources to demonstrate **scalability, security, and automation**.
+## 📌 Overview
+This project is a **multi-tenant client onboarding system** built using **AWS Lambda, API Gateway, and DynamoDB**, deployed via **AWS SAM** and automated using **GitHub Actions CI/CD**.
 
----
+## 🎯 How This Meets the Assignment Requirements
 
-## ** Features**
-✅ **Multi-Tenant Data Storage** using DynamoDB with a partitioning strategy.  
-✅ **Serverless & Cost-Effective** architecture using AWS Lambda.  
-✅ **API-Driven Onboarding** with API Gateway as the entry point.  
-✅ **Error Handling & Logging** built into AWS Lambda.  
-✅ **CI/CD Pipeline** for automated deployments (Optional).  
-
----
-
-## **🛠️ Architecture**
-### **1️⃣ AWS Services Used**
-- **AWS Lambda** → Executes onboarding logic.
-- **Amazon DynamoDB** → Stores multi-tenant client data.
-- **Amazon API Gateway** → Exposes the API for client registration.
-- **AWS Cognito (Optional)** → Manages tenant authentication.
-- **AWS SAM** → Automates infrastructure provisioning.
-
-### **2️⃣ Multi-Tenant DynamoDB Design**
-A **single DynamoDB table** is used for **multi-tenant isolation**:
-| **Partition Key** | **Sort Key** | **Attributes** |
-|---|---|---|
-| tenantId | resourceType#resourceId | clientName, clientPhone, createdAt |
-
-- **Partition Key (`tenantId`)**: Ensures tenant data isolation.
-- **Sort Key (`resourceType#resourceId`)**: Efficient retrieval of various data types.
-- **Pay-per-request** billing model for **cost efficiency**.
-
-### **3️⃣ API Flow**
-1️⃣ Client sends **POST /onboard** request with `clientName` & `clientPhone`.  
-2️⃣ AWS Lambda **generates a unique `tenantId`**.  
-3️⃣ Data is **stored in DynamoDB**.  
-4️⃣ **Response** with `tenantId` is returned.
+| Requirement | Implementation |
+|------------|---------------|
+| **1. Infrastructure Provisioning** | Uses AWS SAM (`template.yml`) to provision **DynamoDB, Lambda, API Gateway** |
+| **2. Onboarding Process Implementation** | Lambda (`index.js`) receives client details, assigns a `tenantId`, and stores it in **DynamoDB** |
+| **3. Error Handling & Logging** | Uses **try-catch** blocks for **400 (Bad Request) and 500 (Internal Server Error)**, with **CloudWatch logs** |
+| **4. CI/CD Simulation** | **GitHub Actions (`deploy.yml`) automatically builds & deploys** on `git push` |
+| **5. Documentation** | This README provides **setup & deployment instructions** |
+| **6. Testing** | Jest unit tests (`test_onboarding.js`) mock AWS SDK, covering **success, missing fields, and DB failures** |
 
 ---
 
-## **🚀 Deployment**
-### **🔹 Prerequisites**
-- **AWS CLI** installed and configured.
-- **AWS SAM CLI** installed.
-- **Node.js 18+** installed.
+## 🚀 How to Set Up the Project
+This guide helps you **set up the project from scratch**, deploy it to AWS, and test the API.
 
-### **🔹 Steps**
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/your-repo/multi-tenant-onboarding.git
-   cd multi-tenant-onboarding
-   ```
-2. Install dependencies:
-   ```sh
-   npm install
-   ```
-3. Deploy using AWS SAM:
-   ```sh
-   sam build
-   sam deploy --guided
-   ```
-4. Once deployed, the API Gateway **URL** will be printed.
+### **1️⃣ Prerequisites**
+Before proceeding, make sure you have:
+- **Node.js** (`v18.x` or later)
+- **AWS CLI** (`aws configure` must be set up)
+- **AWS SAM CLI** (`sam --version` should work)
+- **GitHub Actions** (for CI/CD automation)
 
-### **🔹 Testing the API**
-Send a **POST request** to the API Gateway endpoint:
+---
+
+### **2️⃣ Clone the Repository**
 ```sh
-curl -X POST https://your-api-url.amazonaws.com/Prod/onboard/   -H "Content-Type: application/json"   -d '{"clientName": "Acme Corp", "clientPhone": "+1234567890"}'
+git clone https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation.git
+cd Multi-Tenant-Client-Onboarding-Automation
 ```
-**Expected Response:**
+
+---
+
+### **3️⃣ Create an S3 Bucket for AWS SAM Deployments**
+```sh
+aws s3 mb s3://multi-tenant-sam-deployments --region us-east-1
+```
+- Ensure **Object Ownership** is set to `ACLs Disabled`
+- Ensure **Block Public Access** is **enabled**
+
+---
+
+### **4️⃣ Create IAM User & Set Permissions**
+1. Go to **AWS Console → IAM → Users → Create User**
+2. Name it **`github-actions-deploy`**
+3. Attach Policies:
+   - ✅ `AdministratorAccess` *(Full access)* **OR**
+   - ✅ `AWSLambdaFullAccess`, `AmazonDynamoDBFullAccess`, `AmazonAPIGatewayAdministrator`, `AWSCloudFormationFullAccess`
+4. Copy the **Access Key ID** and **Secret Access Key**
+
+---
+
+### **5️⃣ Configure GitHub Secrets**
+1. Go to **GitHub Repository → Settings → Secrets → Actions**
+2. Click **"New Repository Secret"**, then add:
+   - **Name:** `AWS_ACCESS_KEY_ID` **→ Value:** *(Paste Access Key ID)*
+   - **Name:** `AWS_SECRET_ACCESS_KEY` **→ Value:** *(Paste Secret Access Key)*
+
+---
+
+### **6️⃣ Deploy the Project**
+Run the following:
+```sh
+sam build
+sam deploy --stack-name multi-tenant-onboarding \
+           --s3-bucket multi-tenant-sam-deployments \
+           --capabilities CAPABILITY_IAM \
+           --no-confirm-changeset
+```
+After deployment, **copy the API Gateway URL** from the output.
+
+---
+
+### **7️⃣ Test the API**
+Use **Postman** or `curl` to make a **POST request**:
+```sh
+curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboard/ \
+  -H "Content-Type: application/json" \
+  -d '{"clientName": "Acme Corp", "clientPhone": "+1234567890"}'
+```
+✅ **Expected Response:**
 ```json
 {
   "message": "Client onboarded successfully",
@@ -80,51 +95,42 @@ curl -X POST https://your-api-url.amazonaws.com/Prod/onboard/   -H "Content-Type
 
 ---
 
-## **🛡️ Security Considerations**
-🔹 **IAM Roles**: Lambda functions have least-privilege access to DynamoDB.  
-🔹 **Data Isolation**: `tenantId` ensures that clients cannot access each other’s data.  
-🔹 **API Security**: API Gateway can be integrated with Cognito for authentication.  
-
----
-
-## **🔄 CI/CD Pipeline**
-A **GitHub Actions** workflow is included in `.github/workflows/deploy.yml` to **automate deployments** on push.
-
-```yaml
-on:
-  push:
-    branches:
-      - main
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-      - name: Deploy with AWS SAM
-        run: |
-          sam build
-          sam deploy --no-confirm-changeset
+### **8️⃣ Run Unit Tests Locally**
+```sh
+npm install  # Install dependencies
+npm test     # Run Jest tests
+```
+✅ **Expected Output:**
+```
+PASS  tests/test_onboarding.js
+  ✓ should successfully onboard a new client
+  ✓ should return a 400 error if clientName is missing
+  ✓ should return a 500 error on database failure
 ```
 
 ---
 
-## **📈 Scaling & Future Enhancements**
-### **🔹 Scalability**
-- **DynamoDB auto-scales** to handle millions of tenants.
-- **API Gateway + Lambda scales automatically**.
-- **Partitioning strategy** ensures **efficient query performance**.
+### **9️⃣ Automate Deployment Using GitHub Actions**
+Every push to `main` **triggers a GitHub Actions workflow** (`.github/workflows/deploy.yml`).
 
-### **🔹 Future Enhancements**
-- ✅ **Admin Dashboard** → A web UI for managing tenants.
-- ✅ **Event-Driven Processing** → SNS for notifications.
-- ✅ **Billing & Usage Tracking** → CloudWatch + Cost Explorer.
+```sh
+git add .
+git commit -m "Updated onboarding logic"
+git push origin main
+```
+✅ **This automatically builds and deploys your Lambda function.**
+
+---
+
+## **🎯 Next Steps & Enhancements**
+🔹 **Extend Multi-Tenancy:** Add `tenantId` authentication with **AWS Cognito**.
+🔹 **Admin Dashboard:** Integrate a frontend for managing tenants.
+🔹 **Multi-Region Deployment:** Extend to multiple AWS regions.
 
 ---
 
-## **👨‍💻 Contributors**
-- **Patrice Andala** - [LinkedIn](https://www.linkedin.com/in/yourprofile)
-- **Productive** 
+## **📞 Need Help?**
+If you face any issues, open an issue in the [GitHub repository](https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation/issues).
 
----
+🚀 **Enjoy automated multi-tenant onboarding with AWS!** 🎉
 
