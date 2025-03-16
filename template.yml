@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Multi-Tenant Client Onboarding
+
+Resources:
+  # DynamoDB Table (Multi-Tenant)
+  MultiTenantTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MultiTenantClients
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tenantId
+          AttributeType: S
+        - AttributeName: resourceType#resourceId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tenantId
+          KeyType: HASH
+        - AttributeName: resourceType#resourceId
+          KeyType: RANGE
+
+  # Lambda Function for Onboarding
+  OnboardingLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ClientOnboardingFunction
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: src/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MultiTenantTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MultiTenantTable
+      Events:
+        OnboardingAPI:
+          Type: Api
+          Properties:
+            Path: /onboard
+            Method: POST
+
+Outputs:
+  APIEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/onboard/"

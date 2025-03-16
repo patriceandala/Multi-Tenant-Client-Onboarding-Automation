@@ -1,0 +1,40 @@
+{
+  "name": "multi-tenant-client-onboarding-automation",
+  "version": "1.0.0",
+  "description": "A serverless multi-tenant client onboarding system using AWS Lambda, API Gateway, and DynamoDB.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "start": "sam local start-api",
+    "deploy": "sam build && sam deploy --guided",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation.git"
+  },
+  "author": "Patrice Andala",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation/issues"
+  },
+  "homepage": "https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation#readme",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.538.0",
+    "@aws-sdk/lib-dynamodb": "^3.538.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.6.3",
+    "eslint": "^8.57.0"
+  },
+  "keywords": [
+    "AWS",
+    "Serverless",
+    "Multi-Tenant",
+    "DynamoDB",
+    "Lambda",
+    "API Gateway",
+    "CI/CD"
+  ]
+}
