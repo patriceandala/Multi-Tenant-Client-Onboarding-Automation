@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
   push:
     branches:
-      - main  # Change to the branch you want to trigger deployment
+      - main  # Change this to your deployment branch
 
 jobs:
   deploy:
@@ -18,16 +18,22 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Change to your AWS region
+          aws-region: us-east-1  # Change this to your AWS region
+
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install -y unzip curl
 
       - name: Install AWS SAM CLI
         run: |
-          curl -Lo sam-cli.zip https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
-          unzip sam-cli.zip -d sam-installation
+          curl -Lo aws-sam-cli-linux.zip https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+          unzip aws-sam-cli-linux.zip -d sam-installation
           sudo mv sam-installation/aws-sam-cli /usr/local/bin/sam
           sam --version
 
-      - name: Build and Deploy with SAM
+      - name: Verify AWS SAM Installation
+        run: sam --version || echo "SAM CLI installation failed"
+
+      - name: Build and Deploy with AWS SAM
         run: |
           sam build
           sam deploy --no-confirm-changeset --stack-name multi-tenant-onboarding --capabilities CAPABILITY_IAM
