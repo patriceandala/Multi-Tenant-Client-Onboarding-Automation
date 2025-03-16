@@ -1,14 +1,14 @@
 const { handler } = require("../src/index");
 const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
 
-// ✅ Properly Mock AWS SDK v3
+//  Properly Mock AWS SDK v3
 jest.mock("@aws-sdk/lib-dynamodb", () => {
-    const mockSend = jest.fn(); // ✅ Move mockSend inside the Jest mock
+    const mockSend = jest.fn(); //  Move mockSend inside the Jest mock
 
     return {
         DynamoDBDocumentClient: {
             from: jest.fn(() => ({
-                send: mockSend, // ✅ Ensures send() is correctly defined
+                send: mockSend, //  Ensures send() is correctly defined
             })),
         },
         PutCommand: jest.fn(),
@@ -21,9 +21,9 @@ describe("Onboarding Lambda Function", () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        // ✅ Assign `mockSend` from the Jest mock
+        //  Assign `mockSend` from the Jest mock
         mockSend = DynamoDBDocumentClient.from().send;
-        mockSend.mockResolvedValue({}); // ✅ Ensure it returns success
+        mockSend.mockResolvedValue({}); //  Ensure it returns success
     });
 
     it("should successfully onboard a new client", async () => {
@@ -36,8 +36,8 @@ describe("Onboarding Lambda Function", () => {
 
         const response = await handler(event);
 
-        console.log("===================="); // ✅ Debug log
-        console.log("Mocked Response:", response); // ✅ Debug log
+        console.log("===================="); //  Debug log
+        console.log("Mocked Response:", response); //  Debug log
 
         expect(response.statusCode).toBe(200);
         const body = JSON.parse(response.body);
@@ -61,7 +61,7 @@ describe("Onboarding Lambda Function", () => {
     });
 
     it("should return a 500 error on database failure", async () => {
-        // ✅ Mock a database error
+        //  Mock a database error
         mockSend.mockRejectedValueOnce(new Error("DB error"));
 
         const event = {

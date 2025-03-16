@@ -7,44 +7,44 @@ This project automates the onboarding process for new clients in a multi-tenant 
 
 ---
 
-## ✅ How This Project Meets the Assignment Requirements
+##  How This Project Meets the Assignment Requirements
 
 ### **1. Infrastructure Provisioning**
-- ✅ **DynamoDB Table**: A table (`MultiTenantClients`) with a partition key (`tenantId`) and sort key (`resourceType#resourceId`) to segregate tenant data.
-- ✅ **AWS Lambda Function**: `OnboardingLambda` processes incoming client data and stores it in DynamoDB.
-- ✅ **API Gateway**: Exposes an endpoint (`POST /onboard`) to trigger the Lambda function.
-- ✅ **AWS SAM Template**: The `template.yml` file provisions all resources via AWS CloudFormation.
+-  **DynamoDB Table**: A table (`MultiTenantClients`) with a partition key (`tenantId`) and sort key (`resourceType#resourceId`) to segregate tenant data.
+-  **AWS Lambda Function**: `OnboardingLambda` processes incoming client data and stores it in DynamoDB.
+-  **API Gateway**: Exposes an endpoint (`POST /onboard`) to trigger the Lambda function.
+-  **AWS SAM Template**: The `template.yml` file provisions all resources via AWS CloudFormation.
 
 ### **2. Onboarding Process Implementation**
-- ✅ **Accepts Client Details** (`clientName`, `clientPhone`, etc.)
-- ✅ **Generates a Unique Tenant ID** using `uuidv4()`
-- ✅ **Stores Client Data in DynamoDB** via AWS SDK v3 (`@aws-sdk/client-dynamodb`)
+-  **Accepts Client Details** (`clientName`, `clientPhone`, etc.)
+-  **Generates a Unique Tenant ID** using `uuidv4()`
+-  **Stores Client Data in DynamoDB** via AWS SDK v3 (`@aws-sdk/client-dynamodb`)
 
 ### **3. Error Handling & Logging**
-- ✅ **Handles missing fields** (`400 Bad Request` response)
-- ✅ **Catches unexpected errors** (`500 Internal Server Error` response)
-- ✅ **Logs all steps** (Lambda execution, DynamoDB transactions)
+-  **Handles missing fields** (`400 Bad Request` response)
+-  **Catches unexpected errors** (`500 Internal Server Error` response)
+-  **Logs all steps** (Lambda execution, DynamoDB transactions)
 
 ### **4. CI/CD Pipeline with GitHub Actions**
-- ✅ **Automates Deployment** when pushing to `main`
-- ✅ **Runs Tests with Jest** before deployment
-- ✅ **Uses GitHub Secrets** for AWS credentials
+-  **Automates Deployment** when pushing to `main`
+-  **Runs Tests with Jest** before deployment
+-  **Uses GitHub Secrets** for AWS credentials
 
 ### **5. Unit Testing**
-- ✅ **Mocks AWS SDK calls** (prevents real API calls during testing)
-- ✅ **Tests successful onboarding (`200 OK`)**
-- ✅ **Tests missing field errors (`400 Bad Request`)**
-- ✅ **Tests DynamoDB failures (`500 Internal Server Error`)**
+-  **Mocks AWS SDK calls** (prevents real API calls during testing)
+-  **Tests successful onboarding (`200 OK`)**
+-  **Tests missing field errors (`400 Bad Request`)**
+-  **Tests DynamoDB failures (`500 Internal Server Error`)**
 
 ---
 
 # 🚀 **Setup Guide**
 
 ## **1️⃣ Prerequisites**
-- ✅ **AWS CLI installed** ([Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html))
-- ✅ **AWS SAM CLI installed** ([Install Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
-- ✅ **Node.js 18+ installed** ([Download Node.js](https://nodejs.org/))
-- ✅ **GitHub Actions set up** (for CI/CD deployment)
+-  **AWS CLI installed** ([Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html))
+-  **AWS SAM CLI installed** ([Install Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
+-  **Node.js 18+ installed** ([Download Node.js](https://nodejs.org/))
+-  **GitHub Actions set up** (for CI/CD deployment)
 
 ---
 
@@ -87,7 +87,7 @@ _(Define `trust-policy.json` as a file allowing Lambda to assume this role)_
 aws iam create-user --user-name github-actions-deploy
 ```
 Attach these policies:
-- `AdministratorAccess` (or least privilege policies like `AWSLambdaFullAccess`, `AmazonS3FullAccess`, `AWSCloudFormationFullAccess`, `AmazonDynamoDBFullAccess`)
+- `AdministratorAccess` (or least privilege policies like `AWSLambdaFullAccess`, `AmazonS3FullAccess`, `AWSCloudFormationFullAccess`, `AmazonDynamoDBFullAccess`, `IAMFullAccess`, `AmazonAPIGatewayAdministrator`)
 
 Generate access keys for the user:
 ```sh
@@ -121,7 +121,7 @@ sam deploy --stack-name multi-tenant-onboarding \
   --capabilities CAPABILITY_IAM
 ```
 
-✅ **After deployment, AWS will print an API Gateway URL** like:
+ **After deployment, AWS will print an API Gateway URL** like:
 ```
 https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboard/
 ```
@@ -136,7 +136,7 @@ curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboar
   -d '{"clientName": "Acme Corp", "clientPhone": "+1234567890"}'
 ```
 
-✅ **Expected Response:**
+ **Expected Response:**
 ```json
 {
   "message": "Client onboarded successfully",
@@ -150,7 +150,7 @@ curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboar
 ```sh
   npm test
 ```
-✅ Ensures the Lambda function is working correctly!
+ Ensures the Lambda function is working correctly!
 
 ---
 

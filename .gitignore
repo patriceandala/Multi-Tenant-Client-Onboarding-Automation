@@ -1,6 +1,6 @@
 # Node.js dependencies
-node_modules/
-package-lock.json
+src/node_modules/
+src/package-lock.json
 
 # AWS SAM build artifacts
 .aws-sam/

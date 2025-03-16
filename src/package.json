@@ -2,12 +2,12 @@
   "name": "multi-tenant-client-onboarding-automation",
   "version": "1.0.0",
   "description": "A serverless multi-tenant client onboarding system using AWS Lambda, API Gateway, and DynamoDB.",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "../node_modules/.bin/jest --coverage",
     "start": "sam local start-api",
     "deploy": "sam build && sam deploy --guided",
-    "lint": "eslint ."
+    "lint": "../node_modules/.bin/eslint ."
   },
   "repository": {
     "type": "git",

@@ -35,7 +35,8 @@ jobs:
       - name: Install Node.js Dependencies
         run: |
           cd src
-          npm install  # ✅ Ensures dependencies like uuid are installed
+          npm install  
+          cd ..
 
       - name: Build with AWS SAM
         run: sam build
@@ -45,4 +46,5 @@ jobs:
           sam deploy --stack-name multi-tenant-onboarding \
                      --s3-bucket multi-tenant-sam-deployments \
                      --capabilities CAPABILITY_IAM \
+                     --region us-east-1 \
                      --no-confirm-changeset

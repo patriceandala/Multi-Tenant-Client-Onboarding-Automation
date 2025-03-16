@@ -40,6 +40,8 @@ Resources:
           Properties:
             Path: /onboard
             Method: POST
+      PackageType: Zip  # Ensures all dependencies are packaged
+
 
 Outputs:
   APIEndpoint:
