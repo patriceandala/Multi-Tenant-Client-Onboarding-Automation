@@ -30,7 +30,7 @@ jobs:
         run: sam --version || echo "SAM CLI installation failed"
 
       - name: Remove Previous Build Cache
-        run: rm -rf .aws-sam/  # ✅ Ensures a fresh build
+        run: rm -rf .aws-sam/
 
       - name: Install Node.js Dependencies
         run: |
