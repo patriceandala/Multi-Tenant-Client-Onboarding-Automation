@@ -20,10 +20,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1  # Change this to your AWS region
 
-      - name: Install AWS SAM CLI via Homebrew
+      - name: Install AWS SAM CLI
         run: |
-          sudo apt-get update && sudo apt-get install -y curl
-          brew install aws/tap/aws-sam-cli
+          sudo apt-get update && sudo apt-get install -y unzip curl
+          curl "https://s3.amazonaws.com/aws-sam-cli-releases/latest/aws-sam-cli-linux-x86_64.zip" -o "aws-sam-cli.zip"
+          unzip aws-sam-cli.zip
+          sudo ./install
           sam --version
 
       - name: Verify AWS SAM Installation
