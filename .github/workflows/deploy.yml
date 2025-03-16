@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
   push:
     branches:
-      - main  # Change this to the correct deployment branch
+      - main  # Change this if needed
 
 jobs:
   deploy:
@@ -18,19 +18,23 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Change this to your AWS region
+          aws-region: us-east-1  # Change this if using a different AWS region
 
       - name: Install AWS SAM CLI via Pip
         run: |
           sudo apt-get update && sudo apt-get install -y python3-pip
           pip3 install aws-sam-cli
           sam --version
-      
 
       - name: Verify AWS SAM Installation
         run: sam --version || echo "SAM CLI installation failed"
 
-      - name: Build and Deploy with AWS SAM
+      - name: Build with AWS SAM
+        run: sam build
+
+      - name: Deploy with AWS SAM
         run: |
-          sam build
-          sam deploy --no-confirm-changeset --stack-name multi-tenant-onboarding --capabilities CAPABILITY_IAM
+          sam deploy --stack-name multi-tenant-onboarding \
+                     --s3-bucket multi-tenant-sam-deployments \
+                     --capabilities CAPABILITY_IAM \
+                     --no-confirm-changeset
