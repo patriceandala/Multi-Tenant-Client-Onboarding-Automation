@@ -28,7 +28,6 @@ Resources:
       Runtime: nodejs18.x
       Handler: index.handler
       CodeUri: src/
-      BuildMethod: nodejs18.x  # ✅ Ensures dependencies are installed during deployment
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref MultiTenantTable
