@@ -7,7 +7,28 @@ This project automates the onboarding process for new clients in a multi-tenant 
 
 ---
 
-##  How This Project Meets the Assignment Requirements
+## **📌 Architecture Explanation**
+
+### **Solution Overview**
+The system is built using AWS serverless services to achieve a scalable, cost-effective, and highly available onboarding solution.
+
+### **AWS Services Used**
+1. **Amazon DynamoDB** - A fully managed NoSQL database that stores client data in a multi-tenant model using a partition key (`tenantId`) and a sort key (`resourceType#resourceId`).
+2. **AWS Lambda** - A serverless function (`OnboardingLambda`) that handles onboarding requests by processing client details and saving them to DynamoDB.
+3. **Amazon API Gateway** - An API management service that exposes a `POST /onboard` endpoint to trigger the Lambda function.
+4. **AWS IAM** - Provides authentication and authorization for Lambda execution, API Gateway, and DynamoDB access.
+5. **AWS S3** - Used for storing deployment artifacts when deploying via AWS SAM.
+6. **AWS SAM (Serverless Application Model)** - Automates infrastructure provisioning and deployment.
+7. **GitHub Actions** - Automates the deployment process with a CI/CD pipeline.
+
+### **How This Design Addresses Multitenancy & Automation**
+- **Multi-Tenancy:** Each client is assigned a unique `tenantId`, ensuring data is logically separated while still stored in a shared DynamoDB table.
+- **Automation:** AWS SAM enables infrastructure as code, while GitHub Actions deploys updates automatically on code changes.
+- **Scalability:** Serverless architecture ensures that the system scales automatically based on the number of onboarding requests.
+
+---
+
+##  **📌 How This Project Meets the Assignment Requirements**
 
 ### **1. Infrastructure Provisioning**
 -  **DynamoDB Table**: A table (`MultiTenantClients`) with a partition key (`tenantId`) and sort key (`resourceType#resourceId`) to segregate tenant data.
@@ -50,8 +71,8 @@ This project automates the onboarding process for new clients in a multi-tenant 
 
 ## **2️⃣ Clone the Repository**
 ```sh
- git clone https://github.com/your-username/Multi-Tenant-Client-Onboarding-Automation.git
- cd Multi-Tenant-Client-Onboarding-Automation
+git clone https://github.com/your-username/Multi-Tenant-Client-Onboarding-Automation.git
+cd Multi-Tenant-Client-Onboarding-Automation
 ```
 
 ---
@@ -78,6 +99,7 @@ aws s3 mb s3://multi-tenant-sam-deployments
 aws iam create-role --role-name LambdaExecutionRole \
 --assume-role-policy-document file://trust-policy.json
 ```
+
 _(Define `trust-policy.json` as a file allowing Lambda to assume this role)_
 
 ---
@@ -121,39 +143,15 @@ sam deploy --stack-name multi-tenant-onboarding \
   --capabilities CAPABILITY_IAM
 ```
 
- **After deployment, AWS will print an API Gateway URL** like:
-```
-https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboard/
-```
+---
+
+## **📌 Extension Discussion**
+This project can be extended in several ways:
+1. **Scaling to Hundreds of Clients**: DynamoDB supports auto-scaling, and Lambda can handle concurrent executions with provisioned concurrency.
+2. **Integrating a Fully Featured Admin Dashboard**: An admin dashboard could be built using React/Angular to manage tenant onboarding.
+3. **Adding Authentication**: AWS Cognito can be added to secure API Gateway endpoints.
 
 ---
 
-## **6️⃣ Test the API**
-### **Make a POST request to onboard a new client**
-```sh
-curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod/onboard/ \
-  -H "Content-Type: application/json" \
-  -d '{"clientName": "Acme Corp", "clientPhone": "+1234567890"}'
-```
-
- **Expected Response:**
-```json
-{
-  "message": "Client onboarded successfully",
-  "tenantId": "a1b2c3d4-e5f6-7890-ghij-klmnopqrst"
-}
-```
-
----
-
-## **7️⃣ Run Local Tests**
-```sh
-  npm test
-```
- Ensures the Lambda function is working correctly!
-
----
-
-# 🎉 **Congratulations! You’ve Successfully Set Up the Multi-Tenant Client Onboarding System!**
-🚀 Let me know if you need any further improvements or additional features!
-
+Patrice Andala Opiyo
+patriceandala@gmail.com
