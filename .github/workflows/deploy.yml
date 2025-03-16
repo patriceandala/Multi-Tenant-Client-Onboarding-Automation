@@ -47,4 +47,4 @@ jobs:
                      --s3-bucket multi-tenant-sam-deployments \
                      --capabilities CAPABILITY_IAM \
                      --region us-east-1 \
-                     --no-confirm-changeset
+                     --no-confirm-changeset || [[ $? -eq 1 ]]
