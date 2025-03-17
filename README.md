@@ -140,11 +140,12 @@ npm install
 sam build
 sam deploy --stack-name multi-tenant-onboarding \
   --s3-bucket multi-tenant-sam-deployments \
-  --capabilities CAPABILITY_IAM
+  --capabilities CAPABILITY_IAM \
+  --region us-east-1 
 ```
 
 ---
-
+Ensure that the region you created the S3 bucket in is the region in which you deploy to
 ## **📌 Extension Discussion**
 This project can be extended in several ways:
 1. **Scaling to Hundreds of Clients**: DynamoDB supports auto-scaling, and Lambda can handle concurrent executions with provisioned concurrency.
