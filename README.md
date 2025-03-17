@@ -71,7 +71,7 @@ The system is built using AWS serverless services to achieve a scalable, cost-ef
 
 ## **2️⃣ Clone the Repository**
 ```sh
-git clone https://github.com/your-username/Multi-Tenant-Client-Onboarding-Automation.git
+git clone https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation
 cd Multi-Tenant-Client-Onboarding-Automation
 ```
 
