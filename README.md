@@ -109,7 +109,7 @@ _(Define `trust-policy.json` as a file allowing Lambda to assume this role)_
 aws iam create-user --user-name github-actions-deploy
 ```
 Attach these policies:
-- `AdministratorAccess` (or least privilege policies like `AWSLambdaFullAccess`, `AmazonS3FullAccess`, `AWSCloudFormationFullAccess`, `AmazonDynamoDBFullAccess`, `IAMFullAccess`, `AmazonAPIGatewayAdministrator`)
+- `AdministratorAccess`, `AWSLambdaFullAccess`, `AmazonS3FullAccess`, `AWSCloudFormationFullAccess`, `AmazonDynamoDBFullAccess`, `IAMFullAccess`, `AmazonAPIGatewayAdministrator`
 
 Generate access keys for the user:
 ```sh
