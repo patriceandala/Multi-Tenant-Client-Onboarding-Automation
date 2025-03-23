@@ -2,12 +2,12 @@
 
 By Patrice Andala Opiyo
 
-## 📌 Overview
+##  Overview
 This project automates the onboarding process for new clients in a multi-tenant SaaS platform. It provisions and configures essential AWS resources in an automated and scalable manner using AWS SAM and GitHub Actions.
 
 ---
 
-## **📌 Architecture Explanation**
+##  Architecture Explanation
 
 ### **Solution Overview**
 The system is built using AWS serverless services to achieve a scalable, cost-effective, and highly available onboarding solution.
@@ -28,7 +28,7 @@ The system is built using AWS serverless services to achieve a scalable, cost-ef
 
 ---
 
-##  **📌 How This Project Meets the Assignment Requirements**
+##   How This Project Meets the Assignment Requirements
 
 ### **1. Infrastructure Provisioning**
 -  **DynamoDB Table**: A table (`MultiTenantClients`) with a partition key (`tenantId`) and sort key (`resourceType#resourceId`) to segregate tenant data.
@@ -59,9 +59,9 @@ The system is built using AWS serverless services to achieve a scalable, cost-ef
 
 ---
 
-# 🚀 **Setup Guide**
+#  **Setup Guide**
 
-## **1️⃣ Prerequisites**
+##  Prerequisites
 -  **AWS CLI installed** ([Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html))
 -  **AWS SAM CLI installed** ([Install Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html))
 -  **Node.js 18+ installed** ([Download Node.js](https://nodejs.org/))
@@ -69,7 +69,7 @@ The system is built using AWS serverless services to achieve a scalable, cost-ef
 
 ---
 
-## **2️⃣ Clone the Repository**
+##  Clone the Repository
 ```sh
 git clone https://github.com/patriceandala/Multi-Tenant-Client-Onboarding-Automation
 cd Multi-Tenant-Client-Onboarding-Automation
@@ -77,7 +77,7 @@ cd Multi-Tenant-Client-Onboarding-Automation
 
 ---
 
-## **3️⃣ AWS Setup**
+##  AWS Setup
 
 ### **1. Create an S3 Bucket** (For SAM Deployment Artifacts)
 ```sh
@@ -119,7 +119,7 @@ Copy the **Access Key ID** and **Secret Access Key** for later.
 
 ---
 
-## **4️⃣ Add AWS Credentials to GitHub Actions**
+## ⃣ Add AWS Credentials to GitHub Actions
 Go to **GitHub Repo** → **Settings** → **Secrets and Variables** → **Actions**.
 
 Add the following secrets:
@@ -128,7 +128,7 @@ Add the following secrets:
 
 ---
 
-## **5️⃣ Deploy the Project to AWS**
+## Deploy the Project to AWS
 
 ### **1. Install Dependencies**
 ```sh
@@ -146,7 +146,7 @@ sam deploy --stack-name multi-tenant-onboarding \
 
 ---
 Ensure that the region you created the S3 bucket in is the region in which you deploy to
-## **📌 Extension Discussion**
+##  Extension Discussion
 This project can be extended in several ways:
 1. **Scaling to Hundreds of Clients**: DynamoDB supports auto-scaling, and Lambda can handle concurrent executions with provisioned concurrency.
 2. **Integrating a Fully Featured Admin Dashboard**: An admin dashboard could be built using React/Angular to manage tenant onboarding.
